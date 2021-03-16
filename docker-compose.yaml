@@ -1,0 +1,96 @@
+version: "2.3"
+services:
+  plaid:
+    image: rpspp:latest
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ${LOG_PATH}:/logs
+      - ${COOLL_PATH}:/data/cooll
+      - ${PLAID_PATH}:/data/plaid
+      - ${WHITED_PATH}:/data/whited
+    command: python -m recunilm device-identify
+      --plaid-path=/data/plaid
+      --log-path=/logs
+  cooll:
+    image: rpspp:latest
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ${LOG_PATH}:/logs
+      - ${COOLL_PATH}:/data/cooll
+    command: python -m recunilm device-identify
+      --cooll-path=/data/cooll
+      --log-path=/logs
+
+  whited:
+    image: rpspplatest
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ${LOG_PATH}:/logs
+      - ${WHITED_PATH}:/data/whited
+    command: python -m recunilm device-identify
+      --whited-path=/data/whited
+      --log-path=/logs
+
+  wrg:
+    image: rpspp:latest
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ${LOG_PATH}:/logs
+      - ${WHITED_PATH}:/data/whited
+      - ${COOLL_PATH}:/data/cooll
+      - ${PLAID_PATH}:/data/plaid
+    command: python -m recunilm device-identify
+      --whited-path=/data/whited
+      --cooll-path=/data/cooll
+      --plaid-path=/data/plaid
+      --log-path=/logs
+      --classifier=WRG
+
+  rpspp:
+    image: rpspp:latest
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ${LOG_PATH}:/logs
+      - ${WHITED_PATH}:/data/whited
+      - ${COOLL_PATH}:/data/cooll
+      - ${PLAID_PATH}:/data/plaid
+    command: python -m recunilm device-identify
+      --whited-path=/data/whited
+      --cooll-path=/data/cooll
+      --plaid-path=/data/plaid
+      --log-path=/logs
+      --classifier=SPACIAL
+
+  tensorboard:
+    runtime: nvidia
+    image: tensorflow/tensorflow
+    ports:
+      - 127.0.0.1:6006:6006
+    volumes:
+      - ${LOG_PATH}:/logs
+    command: tensorboard --logdir=/logs --bind_all

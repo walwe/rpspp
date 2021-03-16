@@ -1,0 +1,12 @@
+sklearn
+torch==1.6.0
+#torchvision
+numpy
+click
+pyyaml
+tensorboard
+soundfile
+pyts
+tqdm
+git+https://github.com/walwe/pytorch-recurrence.git
+torchsummary
